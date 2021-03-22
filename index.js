@@ -3,7 +3,6 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const routes = require('./routes');
 
-
 const app = express();
 
 
@@ -16,7 +15,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-      maxAge: 30 * 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      name: "sessionID"
     }
 }))
 app.use('/', routes);

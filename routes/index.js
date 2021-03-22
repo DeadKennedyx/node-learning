@@ -17,5 +17,4 @@ router.put('/game', jsonParser, (request, response) => controllers.updateGame(re
 
 router.put('/game_win', jsonParser, (request, response) => controllers.gameWin(request, response));
 
-
 module.exports = router;

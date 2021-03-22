@@ -8,8 +8,12 @@ $( document ).ready(function() {
       this.user ? this.updateGame() : this.createGame()
     }
 
+    balanceAvailable(){
+      return parseInt($(".balance p").text()) > 0
+    }
+
     checkSession(){
-      var self = this
+      let self = this
       fetch('/session', {
         headers: {
           'Content-type': 'application/json'
@@ -19,13 +23,15 @@ $( document ).ready(function() {
       }).then(function(response){
         return response.json()
       }).then(function(data){
-        self.user = data.game.sessionID
-        $(".balance p").text(data.game.balance);
+        if(data.game){
+          self.user = data.game.sessionID
+          $(".balance p").text(data.game.balance);
+        }
       })
     }
 
     createGame(){
-      var self = this
+      let self = this
       fetch('/game', {
         headers: {
           'Content-type': 'application/json'
@@ -41,6 +47,7 @@ $( document ).ready(function() {
     }
 
     updateGame(){
+      let that = this;
       fetch('/game', {
         headers: {
           'Content-type': 'application/json'
@@ -51,10 +58,23 @@ $( document ).ready(function() {
           return response.json()
       }).then(function(data) {
         $(".balance p").text(data.game.balance);
+        if(that.balanceAvailable()){
+          $('#playFancy').show();
+        }else{
+          $('#playFancy').hide();
+        }
       });
     }
 
+    resetGame(){
+      if (!this.balanceAvailable()){
+        console.log("entro")
+        this.winGame("C")
+      }
+    }
+
     winGame(winningLetter){
+      let that = this;
       fetch('/game_win', {
         headers: {
           'Content-type': 'application/json'
@@ -66,19 +86,22 @@ $( document ).ready(function() {
           return response.json()
       }).then(function(data) {
         $(".balance p").text(data.game.balance);
+        if(this.balanceAvailable()){
+          $('#playFancy').show();
+        }
       });
     }
   }
 
-  spin_button = document.getElementById('spin')
+  reset_button = document.getElementById('reset')
 
 
   const game = new Game();
   game.checkSession();
 
-  // spin_button.addEventListener('click', function(e){
-  //   game.spin()
-  // })
+  reset_button.addEventListener('click', function(e){
+    game.resetGame();
+  })
 
   $('.fancy .slot').jSlots({
       number : 3,
@@ -95,7 +118,7 @@ $( document ).ready(function() {
         $.each(winners, function() {
           this.addClass('winner');
         });
-        var winningLetter = $('ul li').eq(winLetter-1).text();
+        let winningLetter = $('ul li').eq(winLetter-1).text();
         game.winGame(winningLetter);
       }
   });
